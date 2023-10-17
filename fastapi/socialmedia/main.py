@@ -1,6 +1,5 @@
 from fastapi import FastAPI, HTTPException, Response, status
 from pydantic import BaseModel
-from datetime import datetime
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
