@@ -1,5 +1,4 @@
 from typing import Union
-
 from pydantic import BaseModel
 
 
@@ -25,7 +24,7 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    password: str
+    hashed_password: str
 
 
 class User(UserBase):
