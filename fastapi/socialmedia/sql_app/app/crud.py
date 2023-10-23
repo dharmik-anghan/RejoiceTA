@@ -1,14 +1,10 @@
-from .models import User, Item
-from .schemas import ItemCreate, UserCreate, User, Item
-from passlib.context import CryptContext
-
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-
-def get_password_hash(password: str):
-    return pwd_context.hash(password)
+from .models import User
+from .schemas import UserCreate
+from .verify_email import get_otp_stored
+from .to_hashed import get_hashed_password, verify_password
 
 
 def get_user(db: Session, user_id: int):
@@ -24,21 +20,29 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
 
 
 def create_user(db: Session, user: UserCreate):
-    hashed_password = get_password_hash(user.hashed_password)
-    db_user = User(email=user.email, hashed_password=hashed_password)
+    real_hashed_password = get_hashed_password(user.hashed_password)
+
+    hashed_otp = get_otp_stored(user.email)
+
+    db_user = User(
+        first_name=user.first_name,
+        last_name=user.last_name,
+        email=user.email,
+        hashed_password=real_hashed_password,
+        otp_for_email=hashed_otp,
+    )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
     return db_user
 
 
-def get_items(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(Item).offset(skip).limit(limit).all()
-
-
-def create_user_item(db: Session, item: ItemCreate, user_id: int):
-    db_item = Item(title=item.title, description=item.description, owner_id=user_id)
-    db.add(db_item)
+def verify_user_by_email(db: Session, email: str = None, OTP: str = None):
+    verified = db.query(User).filter(User.email == email)
+    if verified.first() == None:
+        raise HTTPException(status_code=404, detail="Email is not registred")
+    user_data = verified.first()
+    if verify_password(OTP, user_data.otp_for_email):
+        verified.update({"verified_email": True, "otp_for_email": None}, synchronize_session=False)
     db.commit()
-    db.refresh(db_item)
-    return db_item
+    return get_user_by_email(db, email=email)

@@ -2,35 +2,20 @@ from typing import Union
 from pydantic import BaseModel
 
 
-class ItemBase(BaseModel):
-    title: str
-    description: Union[str, None] = None
-
-
-class ItemCreate(ItemBase):
-    pass
-
-
-class Item(ItemBase):
-    id: int
-    owner_id: int
-
-    class Config:
-        orm_mode = True
-
-
 class UserBase(BaseModel):
+    first_name: str
+    last_name: str
     email: str
 
 
 class UserCreate(UserBase):
     hashed_password: str
+    otp_for_email: Union[str,None] = None
 
 
 class User(UserBase):
     id: int
-    is_active: bool
-    items: list[Item] = []
+    verified_email: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True

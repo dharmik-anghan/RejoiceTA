@@ -1,25 +1,14 @@
+from sqlalchemy import Boolean, Column, Integer, String
 from .database import Base
-from sqlalchemy import Column, Boolean, String, Integer, ForeignKey
-from sqlalchemy.orm import relationship
 
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, index=True)
-    hashed_password = Column(String)
-    is_active = Column(Boolean, default=True)
-
-    items = relationship("Item", back_populates="owner")
-
-
-class Item(Base):
-    __tablename__ = "items"
-
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
-    description = Column(String, index=True)
-    owner_id = Column(Integer, ForeignKey("users.id"))
-
-    owner = relationship("User", back_populates="items")
+    id = Column(Integer, index=True, primary_key=True, nullable=False)
+    first_name = Column(String, index=True, nullable=False)
+    last_name = Column(String, index=True)
+    email = Column(String, index=True, unique=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    verified_email = Column(Boolean, default=False)
+    otp_for_email = Column(String, default=None)
