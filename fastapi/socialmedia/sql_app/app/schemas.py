@@ -10,7 +10,6 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     hashed_password: str
-    otp_for_email: Union[str,None] = None
 
 
 class User(UserBase):
