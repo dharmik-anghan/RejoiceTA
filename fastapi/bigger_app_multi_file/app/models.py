@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, Boolean, String, TIMESTAMP
+from sqlalchemy import Column, Integer, Boolean, String, TIMESTAMP
 from sqlalchemy.sql.expression import text
 from .database import Base
 from sqlalchemy.orm import relationship
@@ -14,16 +14,6 @@ class User(Base):
     user_created_at = Column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
     )
-
-    otps = relationship("Otps", back_populates="owner")
-
-class Otps(Base):
-    __tablename__ = "otps"
-
-    otp_id = Column(Integer, primary_key=True, nullable=False)
-    otp = Column(String, nullable=False)
-    reason = Column(String, nullable=False)
-    owner_id = Column(Integer, ForeignKey("users.user_id"))
+    otp = Column(String, default=None)
     otp_created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
 
-    owner = relationship("User", back_populates="otps")

@@ -18,10 +18,8 @@ class User(UserBase):
     class Config:
         from_attributes = True
 
-class OtpBase(BaseModel):
-    pass
-
-class OtpCreate(OtpBase):
+class UserForgotPassword(UserCreate):
     otp: str
-    reason: str
-    owner_id: int
+    
+class UserVerifyOtp(UserBase):
+    otp: str

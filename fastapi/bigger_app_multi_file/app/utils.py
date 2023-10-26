@@ -2,6 +2,7 @@ from passlib.context import CryptContext
 from smtplib import SMTP
 from email.message import EmailMessage
 import math, random
+from datetime import datetime, timezone
 
 # Create and verify hashed password and text
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -13,6 +14,15 @@ def get_hashed_password(password: str):
 
 def verify_hashed_password(plaintext: str, hashed_password: str):
     return pwd_context.verify(plaintext, hashed_password)
+
+
+# Difference Between Current and Old Time
+def time_difference(old_time):
+    current_time = datetime.now(timezone.utc)
+
+    difference_time = current_time - old_time
+
+    return difference_time
 
 
 # Sending mail for verification of mail
@@ -43,5 +53,6 @@ def sent_mail_to(email: str):
     s.send_message(msg)
 
     hashed_otp = get_hashed_password(otp)
-    
+
     return hashed_otp
+
