@@ -15,11 +15,12 @@ def welcome():
 @app.route("/result/<int:score>")
 def result(score):
     res = ""
-    if score >= 50:
+    if score>=50:
         res = "PASS"
     else:
         res = "FAIL"
-    return render_template("result.html", result=res)
+    exp = {'score': score, 'res': res}
+    return render_template("result.html", result=exp)
 
 
 # Resylt checker html page
@@ -31,7 +32,7 @@ def submit():
         science = float(request.form["science"])
         maths = float(request.form["maths"])
         c = float(request.form["c"])
-        datascience = float(request.form["datascience"])
+        datascience = float(request.form["datascience"])        
 
         total_score = (science + maths + c + datascience) / 4
 
