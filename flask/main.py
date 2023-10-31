@@ -1,45 +1,20 @@
-# Integrate HTML with Flask
-# HTTP verb GET and POST
-from flask import Flask, render_template, request, url_for, redirect
-from markupsafe import escape
+from flask import Flask, request
+from flask_restful import Api, Resource
 
-# WSGI Application
 app = Flask(__name__)
+api = Api(app)
 
+todos = {}
 
-@app.get("/")
-def welcome():
-    return render_template("index.html")
+class ToDoList(Resource):
+    def get(self, todo_id):
+        return todos[todo_id]
+    
+    def post(self, todo_id):
+        todos[todo_id] = request.form['data']
+        return {todo_id: todos[todo_id]}
+    
+api.add_resource(ToDoList, "/<string:todo_id>")
 
-
-@app.route("/result/<int:score>")
-def result(score):
-    res = ""
-    if score>=50:
-        res = "PASS"
-    else:
-        res = "FAIL"
-    exp = {'score': score, 'res': res}
-    return render_template("result.html", result=exp)
-
-
-# Resylt checker html page
-@app.route("/submit", methods=["POST", "GET"])
-def submit():
-    total_score = 0
-
-    if request.method == "POST":
-        science = float(request.form["science"])
-        maths = float(request.form["maths"])
-        c = float(request.form["c"])
-        datascience = float(request.form["datascience"])        
-
-        total_score = (science + maths + c + datascience) / 4
-
-    return redirect(url_for("result", score=total_score))
-
-
-# You can direct run file from terminal and server will run like python main.py
-# instread of flask --app main run --debug
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
